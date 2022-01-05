@@ -1,24 +1,27 @@
 {
   "name": "alpaca-utils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An extra layer of abstraction on top of the Alpaca SDK with defaults and logging for many use cases.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
     "test": "jest --config jestconfig.json",
     "build": "tsc",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "format": "prettier --write \"src/**/*.ts\"",
     "lint": "tslint -p tsconfig.json",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
     "preversion": "npm run lint",
-    "version" : "npm run format && git add -A src"
+    "version": "npm run format && git add -A src"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tclare/alpaca-utils.git"
   },
-  "keywords": ["Alpaca", "Utils"],
+  "keywords": [
+    "Alpaca",
+    "Utils"
+  ],
   "author": "Tommy Clare",
   "license": "ISC",
   "bugs": {
