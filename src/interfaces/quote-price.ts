@@ -1,12 +1,12 @@
-import { PositionSide } from "@master-chief/alpaca/@types/entities";
+import { PositionSide } from '@master-chief/alpaca/@types/entities';
 
 export interface QuoteConfig {
-    symbol: string,
-    side: PositionSide
+  symbol: string;
+  side: PositionSide;
 }
 
 export interface QuotePrice {
-    symbol: string,
-    side: PositionSide,
-    price: number
+  symbol: string;
+  side: PositionSide;
+  price: number;
 }

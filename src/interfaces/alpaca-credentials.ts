@@ -1,4 +1,4 @@
-export interface AlpacaCredentialsConfig {    
-    apiKeyId: string;
-    secretKey: string;
+export interface AlpacaCredentialsConfig {
+  apiKeyId: string;
+  secretKey: string;
 }
