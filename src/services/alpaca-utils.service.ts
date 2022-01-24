@@ -4,7 +4,13 @@ import { AlpacaClient, Bar_v1, GetBars_v1, PlaceOrder, Snapshot } from '@master-
 
 import { AlpacaCredentialsConfig, QuoteConfig, QuotePrice } from '../interfaces';
 import { MAX_SYMBOLS_PER_BAR_REQUEST, MINUTES_IN_TRADING_DAY, ORDER_LIMIT_MAX } from '../constants/';
-import { getMOCDatetimeNDaysAgo, getMOCOrCurrentTime, getMOODatetimeNDaysAgo, getMOODatetimeToday, getStartOfToday } from './date-service';
+import {
+  getMOCDatetimeNDaysAgo,
+  getMOCOrCurrentTime,
+  getMOODatetimeNDaysAgo,
+  getMOODatetimeToday,
+  getStartOfToday,
+} from './date-service';
 
 export default class AlpacaService {
   private _alpacaClient: AlpacaClient;
@@ -65,7 +71,7 @@ export default class AlpacaService {
     return this.getBars(symbols, {
       start: getMOODatetimeNDaysAgo(n),
       end: getMOCDatetimeNDaysAgo(n),
-      limit: MINUTES_IN_TRADING_DAY
+      limit: MINUTES_IN_TRADING_DAY,
     });
   }
 
@@ -108,10 +114,7 @@ export default class AlpacaService {
   }
 
   closePositions(symbols: string[]) {
-    return P.map(
-      symbols,
-      (symbol: string) => this.closePosition(symbol)
-    )
+    return P.map(symbols, (symbol: string) => this.closePosition(symbol));
   }
 
   closePosition(symbol: string) {

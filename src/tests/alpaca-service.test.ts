@@ -21,8 +21,8 @@ describe('alpaca service tests', () => {
 
   describe('alpaca service: positions', () => {
     it('getPositions', () => {
-      jest.spyOn(alpacaService.alpacaClient, 'getPositions').mockResolvedValue(positionData)
+      jest.spyOn(alpacaService.alpacaClient, 'getPositions').mockResolvedValue(positionData);
       expect(alpacaService.getPositions()).resolves.toBe(positionData);
-    })
-  })
+    });
+  });
 });
