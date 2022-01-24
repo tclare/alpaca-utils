@@ -1,4 +1,4 @@
-import { isPast, startOfToday, parse } from 'date-fns';
+import { isPast, startOfToday, parse, subDays } from 'date-fns';
 import { utcToZonedTime } from 'date-fns-tz';
 
 export function getCurrentDate() {
@@ -17,10 +17,18 @@ export function getMOODatetimeToday() {
   return getDateTodayFromTime('9:30am');
 }
 
+export function getMOODatetimeNDaysAgo(n: number) {
+  return subDays(getMOODatetimeToday(), n);
+}
+
 export function getMOCOrCurrentTime() {
   return isPast(getMOCDatetimeToday()) ? getMOCDatetimeToday() : getCurrentDate();
 }
 
 export function getMOCDatetimeToday() {
   return getDateTodayFromTime('4:00pm');
+}
+
+export function getMOCDatetimeNDaysAgo(n: number) {
+  return subDays(getMOCDatetimeToday(), n);
 }

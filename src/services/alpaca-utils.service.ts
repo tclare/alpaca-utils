@@ -4,7 +4,7 @@ import { AlpacaClient, Bar_v1, GetBars_v1, PlaceOrder, Snapshot } from '@master-
 
 import { AlpacaCredentialsConfig, QuoteConfig, QuotePrice } from '../interfaces';
 import { MAX_SYMBOLS_PER_BAR_REQUEST, MINUTES_IN_TRADING_DAY, ORDER_LIMIT_MAX } from '../constants/';
-import { getMOCOrCurrentTime, getMOODatetimeToday, getStartOfToday } from './date-service';
+import { getMOCDatetimeNDaysAgo, getMOCOrCurrentTime, getMOODatetimeNDaysAgo, getMOODatetimeToday, getStartOfToday } from './date-service';
 
 export default class AlpacaService {
   private _alpacaClient: AlpacaClient;
@@ -58,10 +58,14 @@ export default class AlpacaService {
    * @return: a promise of all the bar data requested
    */
   getBarsMostRecentTradingDay(symbols: string[]) {
+    return this.getMinuteBarsNTradingDaysAgo(symbols, 1);
+  }
+
+  getMinuteBarsNTradingDaysAgo(symbols: string[], n: number) {
     return this.getBars(symbols, {
-      start: getMOODatetimeToday(),
-      end: getMOCOrCurrentTime(),
-      limit: MINUTES_IN_TRADING_DAY,
+      start: getMOODatetimeNDaysAgo(n),
+      end: getMOCDatetimeNDaysAgo(n),
+      limit: MINUTES_IN_TRADING_DAY
     });
   }
 
@@ -92,6 +96,26 @@ export default class AlpacaService {
         };
       }),
     );
+  }
+
+  /**
+   *
+   * @returns a promise of all positions currently
+   * open within the specificed Alpaca account
+   * */
+  getPositions() {
+    return this._alpacaClient.getPositions();
+  }
+
+  closePositions(symbols: string[]) {
+    return P.map(
+      symbols,
+      (symbol: string) => this.closePosition(symbol)
+    )
+  }
+
+  closePosition(symbol: string) {
+    return this._alpacaClient.closePosition({ symbol });
   }
 
   /**

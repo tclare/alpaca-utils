@@ -1,5 +1,6 @@
 import { AlpacaService } from '../index';
-import { accountData } from './constants';
+import { accountData } from './account';
+import { positionData } from './position';
 
 describe('alpaca service tests', () => {
   let alpacaService: AlpacaService;
@@ -17,4 +18,11 @@ describe('alpaca service tests', () => {
       expect(alpacaService.getAccount()).resolves.toBe(accountData);
     });
   });
+
+  describe('alpaca service: positions', () => {
+    it('getPositions', () => {
+      jest.spyOn(alpacaService.alpacaClient, 'getPositions').mockResolvedValue(positionData)
+      expect(alpacaService.getPositions()).resolves.toBe(positionData);
+    })
+  })
 });
