@@ -22,6 +22,10 @@ export default class AlpacaService {
     });
   }
 
+  get alpacaClient(): AlpacaClient {
+    return this._alpacaClient;
+  }
+
   /**
    * Get the user's account associated with
    * the associated API key and secret key.
