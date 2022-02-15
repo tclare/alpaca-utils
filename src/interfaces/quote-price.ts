@@ -8,5 +8,6 @@ export interface QuoteConfig {
 export interface QuotePrice {
   symbol: string;
   side: PositionSide;
-  price: number;
+  askPrice: number;
+  bidPrice: number;
 }

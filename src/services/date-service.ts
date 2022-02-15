@@ -2,7 +2,7 @@ import { isPast, startOfToday, parse, subDays } from 'date-fns';
 import { utcToZonedTime } from 'date-fns-tz';
 
 export function getCurrentDate() {
-  return utcToZonedTime(new Date(), 'America/New_York');
+  return utcToZonedTime(new Date(), 'America/Chicago');
 }
 
 export function getStartOfToday() {
@@ -14,7 +14,7 @@ export function getDateTodayFromTime(time: string): Date {
 }
 
 export function getMOODatetimeToday() {
-  return getDateTodayFromTime('9:30am');
+  return getDateTodayFromTime('8:30am');
 }
 
 export function getMOODatetimeNDaysAgo(n: number) {

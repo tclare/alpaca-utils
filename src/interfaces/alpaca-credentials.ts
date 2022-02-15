@@ -1,4 +1,5 @@
 export interface AlpacaCredentialsConfig {
-  apiKeyId: string;
-  secretKey: string;
+    apiKeyId: string;
+    secretKey: string;
+    verbose?: boolean;
 }
