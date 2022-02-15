@@ -7,7 +7,6 @@ import { getMOCDatetimeToday, getMOODatetimeToday, getStartOfToday } from './dat
 import Logger from '../logger';
 
 export default class AlpacaService {
-
   private _verbose: boolean;
   private _logger: Logger;
   private _alpacaClient: AlpacaClient;
@@ -29,102 +28,87 @@ export default class AlpacaService {
    * @return: a promise of the Alpaca user's account
    */
   getAccount() {
-    return this._alpacaClient.getAccount()
-      .then(account => {
-        if (this._verbose) this._logger.info(
-          `GET ACCOUNT`,
-          `Successfully retrieved account information for this user.`
-        );
+    return this._alpacaClient
+      .getAccount()
+      .then((account) => {
+        if (this._verbose)
+          this._logger.info(`GET ACCOUNT`, `Successfully retrieved account information for this user.`);
         return account;
       })
-      .catch(err => {
-        this._logger.error(
-          `GET ACCOUNT`,
-          `Problem retrieving account with provided credentials.`,
-          err
-        )
-      })
+      .catch((err) => {
+        this._logger.error(`GET ACCOUNT`, `Problem retrieving account with provided credentials.`, err);
+      });
   }
 
   getSomeAssets(symbols: string[]) {
     const symbolSet = new Set(symbols);
-    return this._alpacaClient.getAssets()
+    return this._alpacaClient
+      .getAssets()
       .then((allAssets) => {
-        if (this._verbose) this._logger.info(
-          `GET SOME ASSETS`,
-          `Successfully retrieved information regarding all Alpaca assets.`,
-        );
+        if (this._verbose)
+          this._logger.info(`GET SOME ASSETS`, `Successfully retrieved information regarding all Alpaca assets.`);
         const assetsToReturn = allAssets.filter((a: Asset) => symbolSet.has(a.symbol));
-        if (assetsToReturn.length != symbols.length) this._logger.warn(
-          `GET SOME ASSETS`,
-          `However, some assets specified are not tracked by Alpaca:`,
-          `${JSON.stringify(symbols.filter(s => !assetsToReturn.find(a => s === a.symbol)))}`
-        );
+        if (assetsToReturn.length != symbols.length)
+          this._logger.warn(
+            `GET SOME ASSETS`,
+            `However, some assets specified are not tracked by Alpaca:`,
+            `${JSON.stringify(symbols.filter((s) => !assetsToReturn.find((a) => s === a.symbol)))}`,
+          );
         return assetsToReturn;
       })
-      .catch(err => {
-        this._logger.error(
-          `GET SOME ASSETS`,
-          `Error getting some assets:`,
-          `${JSON.stringify(symbols)}:`,
-          err
-        );
+      .catch((err) => {
+        this._logger.error(`GET SOME ASSETS`, `Error getting some assets:`, `${JSON.stringify(symbols)}:`, err);
         return err;
       });
   }
 
   getSnapshots(symbols: string[]): Promise<Snapshot[]> {
-    return this._alpacaClient.getSnapshots({ symbols })
-      .then(snapshots => {
-        if (this._verbose) this._logger.info(
-          `GET SNAPSHOTS`,
-          `Successfully retrieved snapshots for the following symbols:`,
-          `${JSON.stringify(symbols)}`
-        );
+    return this._alpacaClient
+      .getSnapshots({ symbols })
+      .then((snapshots) => {
+        if (this._verbose)
+          this._logger.info(
+            `GET SNAPSHOTS`,
+            `Successfully retrieved snapshots for the following symbols:`,
+            `${JSON.stringify(symbols)}`,
+          );
 
-        if (Object.keys(snapshots).find(sym => !snapshots[sym])) this._logger.warn(
-          `GET SNAPSHOTS`,
-          `However, Alpaca could not return snapshots for unrecognized symbols:`,
-          `${JSON.stringify(symbols.filter(sym => !snapshots[sym]))}`
-        );
+        if (Object.keys(snapshots).find((sym) => !snapshots[sym]))
+          this._logger.warn(
+            `GET SNAPSHOTS`,
+            `However, Alpaca could not return snapshots for unrecognized symbols:`,
+            `${JSON.stringify(symbols.filter((sym) => !snapshots[sym]))}`,
+          );
 
-        return Object
-          .keys(snapshots)
-          .filter(sym => snapshots[sym])
-          .map(sym => snapshots[sym]);
+        return Object.keys(snapshots)
+          .filter((sym) => snapshots[sym])
+          .map((sym) => snapshots[sym]);
       })
-      .catch(err => {
+      .catch((err) => {
         this._logger.error(
           `GET SNAPSHOTS`,
           `Error getting snapshots given following symbols:`,
           `${JSON.stringify(symbols)}:`,
-          err
+          err,
         );
         return err;
       });
   }
 
   getQuotesToday(symbols: string[], whichQuotes: WhichQuotes) {
-    return P.map(
-      symbols,
-      (symbol) => this._getQuotesTodaySingleSymbol(symbol, whichQuotes)
-    )
+    return P.map(symbols, (symbol) => this._getQuotesTodaySingleSymbol(symbol, whichQuotes));
   }
 
-  _getQuotesTodaySingleSymbol(
-    symbol: string, 
-    whichQuotes: WhichQuotes
-  ): Promise<Quote[]> {
-
+  _getQuotesTodaySingleSymbol(symbol: string, whichQuotes: WhichQuotes): Promise<Quote[]> {
     const getDailyQuotes = (symbol: string, pageToken: string) => {
       return this._alpacaClient.getQuotes({
         symbol,
         start: getMOODatetimeToday(),
         end: getMOCDatetimeToday(),
         limit: 10000,
-        ... pageToken && { page_token: pageToken }
+        ...(pageToken && { page_token: pageToken }),
       });
-    }
+    };
 
     return new Promise<Quote[]>(async (resolve) => {
       let quotes: Quote[] = [];
@@ -137,86 +121,70 @@ export default class AlpacaService {
       while (pageToken != null) {
         const quotePage = await getDailyQuotes(symbol, pageToken);
         pageToken = quotePage.next_page_token;
-        if (
-          whichQuotes === 'all' || 
-          pageToken === null
-        ) {
-          quotes.push(... quotePage.quotes);
+        if (whichQuotes === 'all' || pageToken === null) {
+          quotes.push(...quotePage.quotes);
         }
       }
       resolve(quotes);
     })
 
-    .then(quotes => {
-      if (this._verbose) this._logger.info(
-        `GET QUOTES TODAY (${whichQuotes.toUpperCase()})`,
-        `Successfully retrieved ${whichQuotes} quote information for the symbol ${symbol}.`,
-      )
-      return quotes;
-    })
-
-    .catch(err => {
-      this._logger.error(
-        `GET QUOTES TODAY (${whichQuotes.toUpperCase()})`,
-        `Problem retrieving ${whichQuotes} quote information for the symbol ${symbol}:`, 
-        err
-      );
-      return err;
-    })
-  }
-
-  getPositions() {
-    return this._alpacaClient.getPositions()
-      .then(positions => {
-        if (this._verbose) this._logger.info(
-          `GET POSITIONS`,
-          `Successfully retrieved all open positions`
-        );
-        return positions;
-      })
-      .catch(err => {
-        this._logger.error(
-          `GET POSITIONS`,
-          `Error retrieving open positions`,
-          err
-        )
-      })
-  }
-
-  closePositions(symbols: string[]) {
-    return P
-      .map(symbols, (symbol: string) => this.closePosition(symbol))
-      .then(results => {
-        if (this._verbose) {
+      .then((quotes) => {
+        if (this._verbose)
           this._logger.info(
-            `CLOSE POSITIONS`,
-            `Finished closing ${symbols.length} positions. To recap: `,
-            `Positions successfully closed include: `,
-            `${JSON.stringify(results.filter(r => r.success).map(r => r.order.symbol))} `,
-            `And positions that weren't closed successfully include: `,
-            `${JSON.stringify(results.filter(r => !r.success).map(r => r.order.symbol))}`
-          )
-        }
+            `GET QUOTES TODAY (${whichQuotes.toUpperCase()})`,
+            `Successfully retrieved ${whichQuotes} quote information for the symbol ${symbol}.`,
+          );
+        return quotes;
+      })
+
+      .catch((err) => {
+        this._logger.error(
+          `GET QUOTES TODAY (${whichQuotes.toUpperCase()})`,
+          `Problem retrieving ${whichQuotes} quote information for the symbol ${symbol}:`,
+          err,
+        );
+        return err;
       });
   }
 
-  closePosition(symbol: string): Promise<{ success: boolean; order: Order}> {
-    return this._alpacaClient.closePosition({ symbol })
-      .then(order => {
-        if (this._verbose) this._logger.info(
-          `CLOSE POSITION`,
-          `Position in ${symbol} successfully closed.`
+  getPositions() {
+    return this._alpacaClient
+      .getPositions()
+      .then((positions) => {
+        if (this._verbose) this._logger.info(`GET POSITIONS`, `Successfully retrieved all open positions`);
+        return positions;
+      })
+      .catch((err) => {
+        this._logger.error(`GET POSITIONS`, `Error retrieving open positions`, err);
+      });
+  }
+
+  closePositions(symbols: string[]) {
+    return P.map(symbols, (symbol: string) => this.closePosition(symbol)).then((results) => {
+      if (this._verbose) {
+        this._logger.info(
+          `CLOSE POSITIONS`,
+          `Finished closing ${symbols.length} positions. To recap: `,
+          `Positions successfully closed include: `,
+          `${JSON.stringify(results.filter((r) => r.success).map((r) => r.order.symbol))} `,
+          `And positions that weren't closed successfully include: `,
+          `${JSON.stringify(results.filter((r) => !r.success).map((r) => r.order.symbol))}`,
         );
+      }
+    });
+  }
+
+  closePosition(symbol: string): Promise<{ success: boolean; order: Order }> {
+    return this._alpacaClient
+      .closePosition({ symbol })
+      .then((order) => {
+        if (this._verbose) this._logger.info(`CLOSE POSITION`, `Position in ${symbol} successfully closed.`);
         return { order, success: true };
       })
-      .catch(err => {
-        this._logger.warn(
-          `CLOSE POSITION`,
-          `Problem closing out position in ${symbol}: `
-          , err
-        );
+      .catch((err) => {
+        this._logger.warn(`CLOSE POSITION`, `Problem closing out position in ${symbol}: `, err);
         return { order: null, success: false };
-      })
+      });
   }
 
   /**
@@ -227,22 +195,20 @@ export default class AlpacaService {
    * the result of the order placings.
    */
   placeMultipleOrders(orderConfigs: PlaceOrder[]): Bluebird<void> {
-    return P
-      .map(orderConfigs, this.placeOrder)
-      .then(orderResults => {
-        if (this._verbose) {
-          this._logger.info(
-            `PLACE MULTIPLE ORDERS`,
-            `Finished placing `,
-            `${orderConfigs.length} `,
-            `orders. To recap: `,
-            `Successful orders included: `,
-            `${JSON.stringify(orderResults.filter(r => r.success).map(r => r.symbol))} `,
-            `and failing orders included: `,
-            `${JSON.stringify(orderResults.filter(r => !r.success).map(r => r.symbol))} `
-          );
-        }
-      });
+    return P.map(orderConfigs, this.placeOrder).then((orderResults) => {
+      if (this._verbose) {
+        this._logger.info(
+          `PLACE MULTIPLE ORDERS`,
+          `Finished placing `,
+          `${orderConfigs.length} `,
+          `orders. To recap: `,
+          `Successful orders included: `,
+          `${JSON.stringify(orderResults.filter((r) => r.success).map((r) => r.symbol))} `,
+          `and failing orders included: `,
+          `${JSON.stringify(orderResults.filter((r) => !r.success).map((r) => r.symbol))} `,
+        );
+      }
+    });
   }
 
   /**
@@ -253,25 +219,23 @@ export default class AlpacaService {
    * an order fails, the error is logged, and the promise
    * resolves with false.
    */
-  placeOrder(orderConfig: PlaceOrder): Promise<{symbol: string; success: boolean}> {
-    return this._alpacaClient.placeOrder(orderConfig)
+  placeOrder(orderConfig: PlaceOrder): Promise<{ symbol: string; success: boolean }> {
+    return this._alpacaClient
+      .placeOrder(orderConfig)
       .then(() => {
-        if (this._verbose) this._logger.info(
-          `PLACE ORDER`,
-          `Successfully placed order with config: `,
-          `${JSON.stringify(orderConfig)}`
-        );
+        if (this._verbose)
+          this._logger.info(`PLACE ORDER`, `Successfully placed order with config: `, `${JSON.stringify(orderConfig)}`);
         return { symbol: orderConfig.symbol, success: true };
       })
-      .catch(err => {
+      .catch((err) => {
         this._logger.warn(
           `PLACE ORDER`,
           `Problem placing order with config: `,
-          `${JSON.stringify(orderConfig, null, 4)}`, 
-          err
+          `${JSON.stringify(orderConfig, null, 4)}`,
+          err,
         );
         return { symbol: orderConfig.symbol, success: false };
-      })
+      });
   }
 
   /**
@@ -288,19 +252,13 @@ export default class AlpacaService {
         limit: ORDER_LIMIT_MAX,
         after: getStartOfToday(),
       })
-      .then(orders => {
-        if (this._verbose) this._logger.info(
-          `GET ORDERS PLACED TODAY`,
-          `Successfully retrieved ${orders.length} open orders.`
-        );
+      .then((orders) => {
+        if (this._verbose)
+          this._logger.info(`GET ORDERS PLACED TODAY`, `Successfully retrieved ${orders.length} open orders.`);
       })
-      .catch(err => {
-        this._logger.error(
-          `GET ORDERS PLACED TODAY`,
-          `Problem retrieving orders placed today: `,
-          err
-        );
+      .catch((err) => {
+        this._logger.error(`GET ORDERS PLACED TODAY`, `Problem retrieving orders placed today: `, err);
         return err;
-      })
+      });
   }
 }
