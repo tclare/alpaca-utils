@@ -1,13 +1,12 @@
 import { isPast, startOfToday, parse, subDays } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 
-
 export function getCurrentDate() {
   return new Date();
 }
 
 export function formatCurrentDateInEst(format: string) {
-  return formatInTimeZone(getCurrentDate(), 'America/New_York', format); 
+  return formatInTimeZone(getCurrentDate(), 'America/New_York', format);
 }
 
 export function getStartOfToday() {
