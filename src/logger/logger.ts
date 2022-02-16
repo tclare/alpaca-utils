@@ -3,8 +3,7 @@ import { getCurrentDate } from '../services/date-service';
 
 export default class Logger {
   getCurrentTimeFormatted(): string {
-    const curr = getCurrentDate();
-    return formatInTimeZone(curr, 'America/New_York', 'hh:mm:ss zz');
+    return formatInTimeZone(getCurrentDate(), 'America/New_York', 'hh:mm:ss zz');
   }
 
   info(...args: any[]) {

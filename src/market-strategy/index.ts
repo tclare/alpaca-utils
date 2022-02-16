@@ -1,10 +1,15 @@
 import { isFuture, isPast, isSameMinute } from 'date-fns';
 import { ScheduledMarketFunction } from '../interfaces/market-strategy.interface';
-import { getCurrentDate, getDateTodayFromTime } from '../services/date-service';
+import Logger from '../logger';
+import { formatCurrentDateInEst, getCurrentDate, getDateTodayFromTime } from '../services/date-service';
 
 export default class MarketStrategy {
+  
   private _config: ScheduledMarketFunction[];
+  private _logger: Logger;
+
   constructor(config: ScheduledMarketFunction[]) {
+    this._logger = new Logger()
     this._config = config;
   }
 
@@ -30,6 +35,19 @@ export default class MarketStrategy {
   }
 
   public async execute() {
-    await this._mapDateToConfigFunction()?.code();
+    const f = this._mapDateToConfigFunction();
+    const d = formatCurrentDateInEst('hh:mm');
+    if (f) {
+      this._logger.info(
+        `MARKET STRATEGY`,
+        `Scheduled strategy found at ${d}. Running code now.`
+      );
+      await f.code();
+    } else {
+      this._logger.info(
+        `MARKET STRATEGY`,
+        `No scheduled strategy detected to run at ${d}. Exiting process gracefully.`
+      )
+    }
   }
 }
