@@ -1,6 +1,6 @@
 export interface ScheduledMarketFunction {
   time: string;
-  code: () => {};
+  code: () => void;
 }
 
 /* For now, we'll only support market hours (9:30a-4:00p EST) for the scheduled trading function. */

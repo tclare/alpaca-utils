@@ -29,7 +29,7 @@ export default class MarketStrategy {
     }
   }
 
-  public execute() {
-    this._mapDateToConfigFunction()?.code();
+  public async execute() {
+    await this._mapDateToConfigFunction()?.code();
   }
 }
