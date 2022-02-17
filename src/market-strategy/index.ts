@@ -27,7 +27,8 @@ export default class MarketStrategy {
       */
       if (
         (timeRange.length === 1 && isSameMinute(curr, timeRange[0])) ||
-        (timeRange.length === 2 && isPast(timeRange[0]) || isSameMinute(timeRange[0], curr) && isFuture(timeRange[1]))
+        (timeRange.length === 2 && isPast(timeRange[0])) ||
+        (isSameMinute(timeRange[0], curr) && isFuture(timeRange[1]))
       ) {
         return f;
       }
@@ -38,10 +39,7 @@ export default class MarketStrategy {
     const f = this._mapDateToConfigFunction();
     const d = formatCurrentDateInEst('hh:mm');
     if (f) {
-      this._logger.info(
-        `MARKET STRATEGY`, 
-        `Scheduled strategy found at ${d}. Running code now.`
-      );
+      this._logger.info(`MARKET STRATEGY`, `Scheduled strategy found at ${d}. Running code now.`);
       await f.code();
     } else {
       this._logger.info(
