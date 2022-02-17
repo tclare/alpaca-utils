@@ -1,5 +1,5 @@
 import { isPast, startOfToday, parse, subDays } from 'date-fns';
-import { formatInTimeZone, toDate } from 'date-fns-tz';
+import { formatInTimeZone, toDate, zonedTimeToUtc } from 'date-fns-tz';
 
 export function getCurrentDate() {
   return new Date();
@@ -14,7 +14,8 @@ export function getStartOfToday() {
 }
 
 export function parseTimeFromEst(time: string): Date {
-  return parse(time, 'h:mmaa', getCurrentDate());
+  const extrapolatedDate = parse(time, 'h:mmaa', getCurrentDate());
+  return zonedTimeToUtc(extrapolatedDate, 'America/New_York');
 }
 
 export function getMOODatetimeToday() {
