@@ -1,5 +1,5 @@
 import { isPast, startOfToday, parse, subDays } from 'date-fns';
-import { formatInTimeZone } from 'date-fns-tz';
+import { formatInTimeZone, toDate } from 'date-fns-tz';
 
 export function getCurrentDate() {
   return new Date();
@@ -13,12 +13,12 @@ export function getStartOfToday() {
   return startOfToday();
 }
 
-export function getDateTodayFromTime(time: string): Date {
+export function parseTimeFromEst(time: string): Date {
   return parse(time, 'h:mmaa', getCurrentDate());
 }
 
 export function getMOODatetimeToday() {
-  return getDateTodayFromTime('8:30am');
+  return parseTimeFromEst('9:30am');
 }
 
 export function getMOODatetimeNDaysAgo(n: number) {
@@ -30,7 +30,7 @@ export function getMOCOrCurrentTime() {
 }
 
 export function getMOCDatetimeToday() {
-  return getDateTodayFromTime('4:00pm');
+  return parseTimeFromEst('4:00pm');
 }
 
 export function getMOCDatetimeNDaysAgo(n: number) {
