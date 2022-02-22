@@ -29,13 +29,12 @@ describe('alpaca service tests', () => {
 
   describe('alpaca service: clock', () => {
     it('isMarketOpenNow: case where market is open should return true', async () => {
-      jest.spyOn(alpacaService.alpacaClient, 'getClock').mockResolvedValue(clockData(true))
-      await expect(alpacaService.isMarketOpenNow()).resolves.toBeTruthy()
+      jest.spyOn(alpacaService.alpacaClient, 'getClock').mockResolvedValue(clockData(true));
+      await expect(alpacaService.isMarketOpenNow()).resolves.toBeTruthy();
     });
     it('isMarketOpenNow: case where market is not open should return false', async () => {
-      jest.spyOn(alpacaService.alpacaClient, 'getClock').mockResolvedValue(clockData(false))
-      await expect(alpacaService.isMarketOpenNow()).resolves.toBeFalsy()
-    })
-  })
-
+      jest.spyOn(alpacaService.alpacaClient, 'getClock').mockResolvedValue(clockData(false));
+      await expect(alpacaService.isMarketOpenNow()).resolves.toBeFalsy();
+    });
+  });
 });
