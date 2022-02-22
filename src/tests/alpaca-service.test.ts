@@ -1,5 +1,6 @@
 import { AlpacaService } from '../index';
 import { accountData } from './account';
+import { clockData } from './clock';
 import { positionData } from './position';
 
 describe('alpaca service tests', () => {
@@ -13,16 +14,28 @@ describe('alpaca service tests', () => {
   });
 
   describe('alpaca service: accounts', () => {
-    it('getAccount', () => {
+    it('getAccount', async () => {
       jest.spyOn(alpacaService.alpacaClient, 'getAccount').mockResolvedValue(accountData);
-      expect(alpacaService.getAccount()).resolves.toBe(accountData);
+      await expect(alpacaService.getAccount()).resolves.toBe(accountData);
     });
   });
 
   describe('alpaca service: positions', () => {
-    it('getPositions', () => {
+    it('getPositions', async () => {
       jest.spyOn(alpacaService.alpacaClient, 'getPositions').mockResolvedValue(positionData);
-      expect(alpacaService.getPositions()).resolves.toBe(positionData);
+      await expect(alpacaService.getPositions()).resolves.toBe(positionData);
     });
   });
+
+  describe('alpaca service: clock', () => {
+    it('isMarketOpenNow: case where market is open should return true', async () => {
+      jest.spyOn(alpacaService.alpacaClient, 'getClock').mockResolvedValue(clockData(true))
+      await expect(alpacaService.isMarketOpenNow()).resolves.toBeTruthy()
+    });
+    it('isMarketOpenNow: case where market is not open should return false', async () => {
+      jest.spyOn(alpacaService.alpacaClient, 'getClock').mockResolvedValue(clockData(false))
+      await expect(alpacaService.isMarketOpenNow()).resolves.toBeFalsy()
+    })
+  })
+
 });

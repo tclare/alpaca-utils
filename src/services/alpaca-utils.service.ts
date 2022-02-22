@@ -154,12 +154,44 @@ export default class AlpacaService {
   getPositions() {
     return this._alpacaClient
       .getPositions()
-      .then((positions) => {
-        if (this._verbose) this._logger.info(`GET POSITIONS`, `Successfully retrieved all open positions`);
+      .then(positions => {
+        if (this._verbose) this._logger.info(
+          `GET POSITIONS`, 
+          `Successfully retrieved ${positions.length} open positions`
+        );
         return positions;
       })
-      .catch((err) => {
-        this._logger.error(`GET POSITIONS`, `Error retrieving open positions`, err);
+      .catch(err => {
+        this._logger.error(
+          `GET POSITIONS`, 
+          `Error retrieving open positions:`, 
+          err
+        );
+      });
+  }
+
+  /**
+   * isMarketOpenNow: an abstraction from Alpaca's Clock API
+   * returning whether or not the market is open right now.
+   * @returns boolean
+   */
+  isMarketOpenNow(): Promise<boolean> {
+    return this._alpacaClient
+      .getClock()
+      .then(clock => {
+        if (this._verbose) this._logger.info(
+          `IS MARKET OPEN`,
+          `Successfully retrieved market clock`
+        );
+        return clock.is_open;
+      })
+      .catch(err => {
+        this._logger.error(
+          `IS MARKET OPEN`,
+          `Error retrieving market calendar:`,
+          err
+        );
+        return false;
       });
   }
 
@@ -256,9 +288,11 @@ export default class AlpacaService {
         limit: ORDER_LIMIT_MAX,
         after: getStartOfToday(),
       })
-      .then((orders) => {
-        if (this._verbose)
-          this._logger.info(`GET ORDERS PLACED TODAY`, `Successfully retrieved ${orders.length} open orders.`);
+      .then(orders => {
+        if (this._verbose) this._logger.info(
+          `GET ORDERS PLACED TODAY`, 
+          `Successfully retrieved ${orders.length} open orders.`
+        );
       })
       .catch((err) => {
         this._logger.error(`GET ORDERS PLACED TODAY`, `Problem retrieving orders placed today: `, err);
