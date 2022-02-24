@@ -1,9 +1,11 @@
-import { isFuture, isPast, isSameMinute } from 'date-fns';
-import { ScheduledMarketFunction } from '../interfaces/market-strategy.interface';
+import { getTime, isFuture, isPast, isSameDay, isSameHour, isSameMinute } from 'date-fns';
+import { ScheduledMarketFunction } from '../interfaces/scheduled-market-function';
 import Logger from '../logger';
-import { formatCurrentDateInEst, getCurrentDate, parseTimeFromEst } from '../services/date-service';
+import AlpacaService from '../services/alpaca-utils.service';
+import { formatCurrentDateInEst, getCurrentDate, getCurrentZonedDate, parseTimeFromEst } from '../services';
+import { generateAlpacaCredentials } from '../utils';
 
-export default class MarketStrategy {
+export class MarketStrategy {
   private _config: ScheduledMarketFunction[];
   private _logger: Logger;
 
@@ -25,10 +27,10 @@ export default class MarketStrategy {
         current time matches that one exactly. Otherwise, if the provided time was
         a range, we want to return a handler if the current time falls within that range
       */
+
       if (
         (timeRange.length === 1 && isSameMinute(curr, timeRange[0])) ||
-        (timeRange.length === 2 && isPast(timeRange[0])) ||
-        (isSameMinute(timeRange[0], curr) && isFuture(timeRange[1]))
+        (timeRange.length === 2 && isPast(timeRange[0]) && isFuture(timeRange[1]))
       ) {
         return f;
       }
@@ -36,16 +38,32 @@ export default class MarketStrategy {
   }
 
   public async execute() {
+
+    /* Get the scheduled handler to execute (if it exists) and current formatted date. */
     const f = this._mapDateToConfigFunction();
     const d = formatCurrentDateInEst('hh:mm');
-    if (f) {
+
+    /* Configure an Alpaca Service and check if the market is open. */
+    const config = generateAlpacaCredentials();
+    const alpaca = new AlpacaService(config);
+    const marketIsOpen = await alpaca.isMarketOpenNow();
+
+    /* Execute the handler function 1) if it exists and 2) the market is open. */
+    /* if (!marketIsOpen) {
+      this._logger.info(
+        `MARKET STRATEGY`,
+        `The market is closed today at ${d}! Bypassing execution.`
+      );
+    } else */ if (f) {
       this._logger.info(`MARKET STRATEGY`, `Scheduled strategy found at ${d}. Running code now.`);
-      await f.code();
+      try { await f.code(); }
+      catch (err) { this._logger.error(`Problem executing scheduled handler. See above output for more info.`)}
     } else {
       this._logger.info(
         `MARKET STRATEGY`,
-        `No scheduled strategy detected to run at ${d}. Exiting process gracefully.`,
+        `Market is open, but there exists no scheduled strategy detected to run at ${d}. Exiting function gracefully.`,
       );
     }
+
   }
 }
