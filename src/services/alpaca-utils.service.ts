@@ -182,6 +182,22 @@ export class AlpacaService {
       });
   }
 
+  closeAllPositions(): Promise<{ success: boolean }> {
+    return this._alpacaClient
+      .closePositions()
+      .then((orders) => {
+        if (this._verbose) this._logger.info(
+          `CLOSE ALL POSITIONS`, 
+          `${orders.length} previously open positions now closed.`
+        );
+        return { success: true };
+      })
+      .catch((err) => {
+        this._logger.warn(`CLOSE ALL POSITIONS`, `Problem closing out all positions:`, err);
+        return { success: false };
+      })
+  }
+
   closePositions(symbols: string[]) {
     return P.map(symbols, (symbol: string) => this.closePosition(symbol)).then((results) => {
       if (this._verbose) {
