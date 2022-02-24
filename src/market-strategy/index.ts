@@ -38,7 +38,6 @@ export class MarketStrategy {
   }
 
   public async execute() {
-
     /* Get the scheduled handler to execute (if it exists) and current formatted date. */
     const f = this._mapDateToConfigFunction();
     const d = formatCurrentDateInEst('hh:mm');
@@ -56,14 +55,16 @@ export class MarketStrategy {
       );
     } else */ if (f) {
       this._logger.info(`MARKET STRATEGY`, `Scheduled strategy found at ${d}. Running code now.`);
-      try { await f.code(); }
-      catch (err) { this._logger.error(`Problem executing scheduled handler. See above output for more info.`)}
+      try {
+        await f.code();
+      } catch (err) {
+        this._logger.error(`Problem executing scheduled handler. See above output for more info.`);
+      }
     } else {
       this._logger.info(
         `MARKET STRATEGY`,
         `Market is open, but there exists no scheduled strategy detected to run at ${d}. Exiting function gracefully.`,
       );
     }
-
   }
 }
