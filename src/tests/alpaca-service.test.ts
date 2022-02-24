@@ -20,6 +20,12 @@ describe('alpaca service tests', () => {
     });
   });
 
+  describe('alpaca service: orders', () => {
+    it('cancelAllOrders', async () => {
+      /* TODO */
+    })
+  })
+
   describe('alpaca service: positions', () => {
     it('getPositions', async () => {
       jest.spyOn(alpacaService.alpacaClient, 'getPositions').mockResolvedValue(positionData);

@@ -210,6 +210,26 @@ export class AlpacaService {
       });
   }
 
+  cancelAllOrders(): Promise<{ success: boolean }> {
+    return this._alpacaClient
+      .cancelOrders()
+      .then(orderCancellations => {
+        if (this._verbose) this._logger.info(
+          `CANCEL ALL ORDERS`,
+          `Successfully cancelled ${orderCancellations.length} open orders.`
+        );
+        return { success: true }
+      })
+      .catch(err => {
+        this._logger.error(
+          `CANCEL ALL ORDERS`,
+          `Error cancelling all orders:`,
+          err
+        );
+        return { success: false }
+      })
+  }
+
   /**
    *
    * @param orderConfigs - an array of order config
