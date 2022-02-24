@@ -1,21 +1,27 @@
-import { getTime, isFuture, isPast, isSameDay, isSameHour, isSameMinute } from 'date-fns';
+import { isFuture, isPast, isSameMinute } from 'date-fns';
 import { ScheduledMarketFunction } from '../interfaces/scheduled-market-function';
 import Logger from '../logger';
-import AlpacaService from '../services/alpaca-utils.service';
+import { AlpacaService } from '../services/alpaca-utils.service';
 import { formatCurrentDateInEst, getCurrentDate, getCurrentZonedDate, parseTimeFromEst } from '../services';
-import { generateAlpacaCredentials } from '../utils';
+import { AlpacaCredentialsConfig } from '..';
 
 export class MarketStrategy {
-  private _config: ScheduledMarketFunction[];
+  
+  private _scheduleConfig: ScheduledMarketFunction[];
   private _logger: Logger;
+  private _alpacaService: AlpacaService;
 
-  constructor(config: ScheduledMarketFunction[]) {
+  constructor(
+    scheduleConfig: ScheduledMarketFunction[], 
+    alpacaConfig: AlpacaCredentialsConfig
+  ) {
     this._logger = new Logger();
-    this._config = config;
+    this._scheduleConfig = scheduleConfig;
+    this._alpacaService = new AlpacaService(alpacaConfig)
   }
 
   private _mapDateToConfigFunction(): ScheduledMarketFunction {
-    for (let f of this._config) {
+    for (let f of this._scheduleConfig) {
       /* 
         Break up time range with split(); trim each string and 
         convert into the respective date today. 
@@ -43,9 +49,7 @@ export class MarketStrategy {
     const d = formatCurrentDateInEst('hh:mm');
 
     /* Configure an Alpaca Service and check if the market is open. */
-    const config = generateAlpacaCredentials();
-    const alpaca = new AlpacaService(config);
-    const marketIsOpen = await alpaca.isMarketOpenNow();
+    const marketIsOpen = await this._alpacaService.isMarketOpenNow();
 
     /* Execute the handler function 1) if it exists and 2) the market is open. */
     /* if (!marketIsOpen) {
@@ -56,7 +60,7 @@ export class MarketStrategy {
     } else */ if (f) {
       this._logger.info(`MARKET STRATEGY`, `Scheduled strategy found at ${d}. Running code now.`);
       try {
-        await f.code();
+        await f.code(this._alpacaService);
       } catch (err) {
         this._logger.error(`Problem executing scheduled handler. See above output for more info.`);
       }

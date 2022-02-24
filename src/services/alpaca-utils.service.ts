@@ -6,7 +6,7 @@ import { ORDER_LIMIT_MAX } from '../constants/';
 import { getMOCDatetimeToday, getMOODatetimeToday, getStartOfToday } from './date-service';
 import Logger from '../logger';
 
-export default class AlpacaService {
+export class AlpacaService {
   private _verbose: boolean;
   private _logger: Logger;
   private _alpacaClient: AlpacaClient;

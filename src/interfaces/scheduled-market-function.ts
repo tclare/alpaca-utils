@@ -1,4 +1,6 @@
+import { AlpacaService } from "..";
+
 export interface ScheduledMarketFunction {
   time: string;
-  code: () => void;
+  code: (alpaca: AlpacaService) => void;
 }

@@ -1,4 +1,4 @@
-import { AlpacaService } from '../index';
+import { AlpacaService } from '../services';
 import { accountData } from './account';
 import { clockData } from './clock';
 import { positionData } from './position';
