@@ -186,16 +186,14 @@ export class AlpacaService {
     return this._alpacaClient
       .closePositions()
       .then((orders) => {
-        if (this._verbose) this._logger.info(
-          `CLOSE ALL POSITIONS`, 
-          `${orders.length} previously open positions now closed.`
-        );
+        if (this._verbose)
+          this._logger.info(`CLOSE ALL POSITIONS`, `${orders.length} previously open positions now closed.`);
         return { success: true };
       })
       .catch((err) => {
         this._logger.warn(`CLOSE ALL POSITIONS`, `Problem closing out all positions:`, err);
         return { success: false };
-      })
+      });
   }
 
   closePositions(symbols: string[]) {
