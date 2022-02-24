@@ -61,7 +61,7 @@ export class MarketStrategy {
         this._logger.error(
           `MARKET STRATEGY`,
           `Problem executing scheduled handler. See above output for more info.`,
-          err
+          err,
         );
       }
     } else {
