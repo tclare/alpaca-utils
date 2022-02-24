@@ -1,4 +1,4 @@
-import { AlpacaService } from "..";
+import { AlpacaService } from '..';
 
 export interface ScheduledMarketFunction {
   time: string;

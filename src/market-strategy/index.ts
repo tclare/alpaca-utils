@@ -6,18 +6,14 @@ import { formatCurrentDateInEst, getCurrentDate, getCurrentZonedDate, parseTimeF
 import { AlpacaCredentialsConfig } from '..';
 
 export class MarketStrategy {
-  
   private _scheduleConfig: ScheduledMarketFunction[];
   private _logger: Logger;
   private _alpacaService: AlpacaService;
 
-  constructor(
-    scheduleConfig: ScheduledMarketFunction[], 
-    alpacaConfig: AlpacaCredentialsConfig
-  ) {
+  constructor(scheduleConfig: ScheduledMarketFunction[], alpacaConfig: AlpacaCredentialsConfig) {
     this._logger = new Logger();
     this._scheduleConfig = scheduleConfig;
-    this._alpacaService = new AlpacaService(alpacaConfig)
+    this._alpacaService = new AlpacaService(alpacaConfig);
   }
 
   private _mapDateToConfigFunction(): ScheduledMarketFunction {
