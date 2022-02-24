@@ -58,7 +58,11 @@ export class MarketStrategy {
       try {
         await f.code(this._alpacaService);
       } catch (err) {
-        this._logger.error(`Problem executing scheduled handler. See above output for more info.`);
+        this._logger.error(
+          `MARKET STRATEGY`,
+          `Problem executing scheduled handler. See above output for more info.`,
+          err
+        );
       }
     } else {
       this._logger.info(
