@@ -8,11 +8,9 @@
     "start": "npm run build && node lib/scratch-space/index.js",
     "test": "jest",
     "build": "tsc",
-    "format": "prettier --write \"src/**/*.ts\"",
     "prepare": "npm run build",
     "prepublishOnly": "npm test",
-    "publish": "./scripts/publish.sh",
-    "version": "npm run format && git add -A src"
+    "publish": "./scripts/publish.sh"
   },
   "repository": {
     "type": "git",

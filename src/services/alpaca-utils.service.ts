@@ -165,7 +165,10 @@ export class AlpacaService {
       .getPositions()
       .then((positions) => {
         if (this._verbose)
-          this._logger.info(`GET POSITIONS`, `Successfully retrieved ${positions.length} open positions`);
+          this._logger.info(
+            `GET POSITIONS`, 
+            `Successfully retrieved ${positions.length} open positions`
+          );
         return positions;
       })
       .catch((err) => {
