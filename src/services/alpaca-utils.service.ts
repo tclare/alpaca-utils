@@ -67,7 +67,7 @@ export class AlpacaService {
       });
   }
 
-  getSnapshots(symbols: string[]): Promise<Snapshot[]> {
+  getSnapshots(symbols: string[]): Promise<{[symbol: string]: Snapshot}> {
     return this._alpacaClient
       .getSnapshots({ symbols })
       .then((snapshots) => {
@@ -85,9 +85,7 @@ export class AlpacaService {
             `${JSON.stringify(symbols.filter((sym) => !snapshots[sym]))}`,
           );
 
-        return Object.keys(snapshots)
-          .filter((sym) => snapshots[sym])
-          .map((sym) => snapshots[sym]);
+        return snapshots;
       })
       .catch((err) => {
         this._logger.error(

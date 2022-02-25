@@ -11,6 +11,7 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "prepare": "npm run build",
     "prepublishOnly": "npm test",
+    "publish": "./scripts/publish.sh",
     "version": "npm run format && git add -A src"
   },
   "repository": {
