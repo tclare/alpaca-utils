@@ -1,6 +1,6 @@
 {
   "name": "alpaca-utils",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "An extra layer of abstraction on top of the Alpaca SDK with defaults and logging for many use cases.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

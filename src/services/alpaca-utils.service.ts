@@ -110,9 +110,8 @@ export class AlpacaService {
             return resolve({ [symbol]: quotes });
           }),
       );
-      return resolve(Object.assign({}, ... quoteData));
-    })
-    
+      return resolve(Object.assign({}, ...quoteData));
+    });
   }
 
   _getQuotesTodaySingleSymbol(symbol: string, whichQuotes: WhichQuotes): Promise<Quote[]> {
