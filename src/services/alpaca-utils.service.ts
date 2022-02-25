@@ -67,7 +67,7 @@ export class AlpacaService {
       });
   }
 
-  getSnapshots(symbols: string[]): Promise<{[symbol: string]: Snapshot}> {
+  getSnapshots(symbols: string[]): Promise<{ [symbol: string]: Snapshot }> {
     return this._alpacaClient
       .getSnapshots({ symbols })
       .then((snapshots) => {
