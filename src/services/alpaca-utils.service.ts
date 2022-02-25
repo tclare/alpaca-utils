@@ -100,15 +100,19 @@ export class AlpacaService {
       });
   }
 
-  getQuotesToday(symbols: string[], whichQuotes: WhichQuotes): Promise<{ [symbol: string]: Quote[] }[]> {
-    return P.map(
-      symbols,
-      (symbol) =>
-        new Promise(async (resolve) => {
-          const quotes = await this._getQuotesTodaySingleSymbol(symbol, whichQuotes);
-          return resolve({ [symbol]: quotes });
-        }),
-    );
+  async getQuotesToday(symbols: string[], whichQuotes: WhichQuotes): Promise<{ [symbol: string]: Quote[] }> {
+    return new Promise(async (resolve) => {
+      const quoteData = await P.map<any, { [symbol: string]: Quote[] }>(
+        symbols,
+        (symbol) =>
+          new Promise(async (resolve) => {
+            const quotes = await this._getQuotesTodaySingleSymbol(symbol, whichQuotes);
+            return resolve({ [symbol]: quotes });
+          }),
+      );
+      return resolve(Object.assign({}, ... quoteData));
+    })
+    
   }
 
   _getQuotesTodaySingleSymbol(symbol: string, whichQuotes: WhichQuotes): Promise<Quote[]> {
