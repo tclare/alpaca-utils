@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import Bluebird, { Promise as P } from 'bluebird';
-import { AlpacaClient, Asset, Order, PlaceOrder, Quote, Snapshot } from '@master-chief/alpaca';
+import { Account, AlpacaClient, Asset, Order, PlaceOrder, Position, Quote, Snapshot } from '@master-chief/alpaca';
 import { AlpacaCredentialsConfig, WhichQuotes } from '../interfaces';
 import { ORDER_LIMIT_MAX } from '../constants/';
 import { getMOCDatetimeToday, getMOODatetimeToday, getStartOfToday } from './date-service';
@@ -31,7 +31,7 @@ export class AlpacaService {
    * the associated API key and secret key.
    * @return: a promise of the Alpaca user's account
    */
-  getAccount() {
+  getAccount(): Promise<Account> {
     return this._alpacaClient
       .getAccount()
       .then((account) => {
@@ -41,10 +41,11 @@ export class AlpacaService {
       })
       .catch((err) => {
         this._logger.error(`GET ACCOUNT`, `Problem retrieving account with provided credentials.`, err);
+        return err;
       });
   }
 
-  getSomeAssets(symbols: string[]) {
+  getSomeAssets(symbols: string[]): Promise<Asset[]> {
     const symbolSet = new Set(symbols);
     return this._alpacaClient
       .getAssets()
@@ -99,17 +100,26 @@ export class AlpacaService {
       });
   }
 
-  getQuotesToday(symbols: string[], whichQuotes: WhichQuotes) {
-    return P.map(symbols, (symbol) => this._getQuotesTodaySingleSymbol(symbol, whichQuotes));
+  getQuotesToday(
+    symbols: string[], 
+    whichQuotes: WhichQuotes
+  ): Promise<{[symbol: string]: Quote[]}[]> {
+    return P.map(symbols, (symbol) => new Promise(async (resolve) => {
+      const quotes = await this._getQuotesTodaySingleSymbol(symbol, whichQuotes);
+      return resolve({ [symbol]: quotes })
+    }));
   }
 
-  _getQuotesTodaySingleSymbol(symbol: string, whichQuotes: WhichQuotes): Promise<Quote[]> {
+  _getQuotesTodaySingleSymbol(
+    symbol: string, 
+    whichQuotes: WhichQuotes
+  ): Promise<Quote[]> {
     const getDailyQuotes = (symbol: string, pageToken: string) => {
       return this._alpacaClient.getQuotes({
         symbol,
         start: getMOODatetimeToday(),
         end: getMOCDatetimeToday(),
-        limit: 10000,
+        limit: whichQuotes === 'all' ? 10000 : 1,
         ...(pageToken && { page_token: pageToken }),
       });
     };
@@ -151,7 +161,7 @@ export class AlpacaService {
       });
   }
 
-  getPositions() {
+  getPositions(): Promise<Position[]> {
     return this._alpacaClient
       .getPositions()
       .then((positions) => {
@@ -161,6 +171,7 @@ export class AlpacaService {
       })
       .catch((err) => {
         this._logger.error(`GET POSITIONS`, `Error retrieving open positions:`, err);
+        return err;
       });
   }
 
