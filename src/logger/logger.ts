@@ -12,21 +12,19 @@ export default class Logger {
   }
 
   info(...args: any[]) {
-    console.info(
-      `[INFO][${this.getFunctionNameWithEllipsis(args[0])}][${this.getCurrentTimeFormatted()}]`,
-      ...args.slice(1),
-    );
+    this.log('INFO', ... args);
   }
   warn(...args: any[]) {
-    console.warn(
-      `[WARN][${this.getFunctionNameWithEllipsis(args[0])}][${this.getCurrentTimeFormatted()}]`,
-      ...args.slice(1),
-    );
+    this.log('WARN', ... args);
   }
   error(...args: any[]) {
-    console.error(
-      `[ERRO][${this.getFunctionNameWithEllipsis(args[0])}][${this.getCurrentTimeFormatted()}]`,
-      ...args.slice(1),
-    );
+    this.log('ERRO', ... args)
+  }
+
+  log(type: string, ...args: any) {
+    args.map((arg: any, i: number) => {
+      if (i === 0) process.stdout.write(`[${type}][${this.getFunctionNameWithEllipsis(arg)}][${this.getCurrentTimeFormatted()}]`)
+      else process.stdout.write(` ${arg}`);
+    });
   }
 }
