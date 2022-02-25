@@ -10,7 +10,7 @@
     "build": "tsc",
     "prepare": "npm run build",
     "prepublishOnly": "npm test",
-    "publish": "./scripts/publish.sh"
+    "publishScript": "./scripts/publish.sh"
   },
   "repository": {
     "type": "git",
