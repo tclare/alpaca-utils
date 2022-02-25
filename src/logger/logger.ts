@@ -26,5 +26,6 @@ export default class Logger {
       if (i === 0) process.stdout.write(`[${type}][${this.getFunctionNameWithEllipsis(arg)}][${this.getCurrentTimeFormatted()}]`)
       else process.stdout.write(` ${arg}`);
     });
+    process.stdout.write('\n')
   }
 }
