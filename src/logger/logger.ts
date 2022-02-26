@@ -7,7 +7,7 @@ export default class Logger {
   }
 
   getFunctionNameWithEllipsis(name: string) {
-    const spaces = Array(35 - name.length).join('.');
+    const spaces = Array(25 - name.length).join('.');
     return `${name}${spaces}`;
   }
 

@@ -43,7 +43,7 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@master-chief/alpaca": "^6.3.10",
+    "@master-chief/alpaca": "^6.3.12",
     "bluebird": "^3.7.2",
     "date-fns": "^2.28.0",
     "date-fns-tz": "^1.2.2",

@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import Bluebird, { Promise as P } from 'bluebird';
-import { Account, AlpacaClient, Asset, Order, PlaceOrder, Position, Quote, Snapshot } from '@master-chief/alpaca';
+import { Account, AlpacaClient, AlpacaStream, Asset, Order, PlaceOrder, Position, Quote, Snapshot } from '@master-chief/alpaca';
 import { AlpacaCredentialsConfig, WhichQuotes } from '../interfaces';
 import { ORDER_LIMIT_MAX } from '../constants/';
 import { getMOCDatetimeToday, getMOODatetimeToday, getStartOfToday } from './date-service';
@@ -10,20 +10,34 @@ export class AlpacaService {
   private _verbose: boolean;
   private _logger: Logger;
   private _alpacaClient: AlpacaClient;
+  private _alpacaStream: AlpacaStream;
 
   constructor(config: AlpacaCredentialsConfig) {
     this._verbose = config.verbose ?? false;
     this._logger = new Logger();
-    this._alpacaClient = new AlpacaClient({
-      credentials: {
-        key: config.apiKeyId,
-        secret: config.secretKey,
-      },
-    });
+
+    const credentials = {
+      key: config.apiKeyId,
+      secret: config.secretKey,
+    }
+
+    this._alpacaClient = new AlpacaClient({ credentials });
+
+    if (config.type === 'stream') {
+      this._alpacaStream = new AlpacaStream({
+        credentials,
+        type: 'account',
+        source: 'sip'
+      });
+    }
   }
 
   get alpacaClient(): AlpacaClient {
     return this._alpacaClient;
+  }
+
+  get alpacaStream(): AlpacaStream {
+    return this._alpacaStream;
   }
 
   /**
@@ -324,5 +338,15 @@ export class AlpacaService {
         this._logger.error(`GET ORDERS PLACED TODAY`, `Problem retrieving orders placed today: `, err);
         return err;
       });
+  }
+
+  listenForAuthentication(cb: () => void): void {
+    this._alpacaStream.once('authenticated', async () => {
+      this._logger.info(
+        'LISTEN (AUTHENTICATION)',
+        'Successfully authenticated to Alpaca stream :)'
+      );
+      await cb();
+    })
   }
 }
