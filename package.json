@@ -27,6 +27,8 @@
   },
   "homepage": "https://github.com/tclare/alpaca-utils#readme",
   "devDependencies": {
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-typescript": "^7.16.7",
     "@types/aws-lambda": "^8.10.89",
     "@types/bluebird": "^3.5.36",
     "@types/jest": "^27.4.0",

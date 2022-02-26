@@ -10,6 +10,7 @@ describe('alpaca service tests', () => {
     alpacaService = new AlpacaService({
       apiKeyId: 'some-api-key',
       secretKey: 'some-secret-key',
+      type: 'client'
     });
   });
 
