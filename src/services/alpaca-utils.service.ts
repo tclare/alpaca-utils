@@ -273,7 +273,10 @@ export class AlpacaService {
    * the result of the order placings.
    */
   placeMultipleOrders(orderConfigs: PlaceOrder[]): Bluebird<void> {
-    return P.map(orderConfigs, this.placeOrder).then((orderResults) => {
+    return P.map(
+      orderConfigs, 
+      (orderConfig) => this.placeOrder(orderConfig)
+    ).then((orderResults) => {
       if (this._verbose) {
         this._logger.info(
           `PLACE MULTIPLE ORDERS`,
