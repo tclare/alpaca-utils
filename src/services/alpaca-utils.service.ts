@@ -343,7 +343,7 @@ export class AlpacaService {
         this._logger.warn(
           `PLACE ORDER`,
           `Problem placing order with config: `,
-          `${JSON.stringify(orderConfig, null, 4)}: `,
+          `${JSON.stringify(orderConfig)}: `,
           `${JSON.stringify(err)}`
         );
         return { symbol: orderConfig.symbol, success: false };
