@@ -54,7 +54,11 @@ export class AlpacaService {
         return account;
       })
       .catch((err) => {
-        this._logger.error(`GET ACCOUNT`, `Problem retrieving account with provided credentials.`, err);
+        this._logger.error(
+          `GET ACCOUNT`, 
+          `Problem retrieving account with provided credentials.`, 
+          JSON.stringify(err)
+        );
         return err;
       });
   }
@@ -76,7 +80,12 @@ export class AlpacaService {
         return assetsToReturn;
       })
       .catch((err) => {
-        this._logger.error(`GET SOME ASSETS`, `Error getting some assets:`, `${JSON.stringify(symbols)}:`, err);
+        this._logger.error(
+          `GET SOME ASSETS`, 
+          `Error getting some assets:`, 
+          `${JSON.stringify(symbols)}:`, 
+          `${JSON.stringify(err)}`
+        );
         return err;
       });
   }
@@ -106,7 +115,7 @@ export class AlpacaService {
           `GET SNAPSHOTS`,
           `Error getting snapshots given following symbols:`,
           `${JSON.stringify(symbols)}:`,
-          err,
+          JSON.stringify(err),
         );
         return err;
       });
@@ -168,7 +177,7 @@ export class AlpacaService {
         this._logger.error(
           `GET QUOTES TODAY (${whichQuotes.toUpperCase()})`,
           `Problem retrieving ${whichQuotes} quote information for the symbol ${symbol}:`,
-          err,
+          JSON.stringify(err),
         );
         return err;
       });
@@ -186,7 +195,11 @@ export class AlpacaService {
         return positions;
       })
       .catch((err) => {
-        this._logger.error(`GET POSITIONS`, `Error retrieving open positions:`, err);
+        this._logger.error(
+          `GET POSITIONS`, 
+          `Error retrieving open positions:`, 
+          JSON.stringify(err)
+        );
         return err;
       });
   }
@@ -204,7 +217,11 @@ export class AlpacaService {
         return clock.is_open;
       })
       .catch((err) => {
-        this._logger.error(`IS MARKET OPEN`, `Error retrieving market calendar:`, err);
+        this._logger.error(
+          `IS MARKET OPEN`, 
+          `Error retrieving market calendar:`, 
+          JSON.stringify(err)
+        );
         return false;
       });
   }
@@ -218,7 +235,11 @@ export class AlpacaService {
         return { success: true };
       })
       .catch((err) => {
-        this._logger.warn(`CLOSE ALL POSITIONS`, `Problem closing out all positions:`, err);
+        this._logger.warn(
+          `CLOSE ALL POSITIONS`, 
+          `Problem closing out all positions:`, 
+          JSON.stringify(err)
+        );
         return { success: false };
       });
   }
@@ -246,7 +267,11 @@ export class AlpacaService {
         return { order, success: true };
       })
       .catch((err) => {
-        this._logger.warn(`CLOSE POSITION`, `Problem closing out position in ${symbol}: `, err);
+        this._logger.warn(
+          `CLOSE POSITION`, 
+          `Problem closing out position in ${symbol}: `, 
+          JSON.stringify(err)
+        );
         return { order: null, success: false };
       });
   }
@@ -260,7 +285,11 @@ export class AlpacaService {
         return { success: true };
       })
       .catch((err) => {
-        this._logger.error(`CANCEL ALL ORDERS`, `Error cancelling all orders:`, err);
+        this._logger.error(
+          `CANCEL ALL ORDERS`, 
+          `Error cancelling all orders:`, 
+          JSON.stringify(err)
+        );
         return { success: false };
       });
   }
@@ -277,6 +306,8 @@ export class AlpacaService {
       orderConfigs, 
       (orderConfig) => this.placeOrder(orderConfig)
     ).then((orderResults) => {
+      const successfulSymbols = orderResults.filter((r) => r.success).map((r) => r.symbol);
+      const failingSymbols = orderResults.filter((r) => !r.success).map((r) => r.symbol);
       if (this._verbose) {
         this._logger.info(
           `PLACE MULTIPLE ORDERS`,
@@ -284,9 +315,9 @@ export class AlpacaService {
           `${orderConfigs.length} `,
           `orders. To recap: `,
           `Successful orders included: `,
-          `${JSON.stringify(orderResults.filter((r) => r.success).map((r) => r.symbol))} `,
+          `${JSON.stringify(successfulSymbols)} `,
           `and failing orders included: `,
-          `${JSON.stringify(orderResults.filter((r) => !r.success).map((r) => r.symbol))} `,
+          `${JSON.stringify(failingSymbols)} `,
         );
       }
     });
@@ -312,8 +343,8 @@ export class AlpacaService {
         this._logger.warn(
           `PLACE ORDER`,
           `Problem placing order with config: `,
-          `${JSON.stringify(orderConfig, null, 4)}`,
-          err,
+          `${JSON.stringify(orderConfig, null, 4)}: `,
+          `${JSON.stringify(err)}`
         );
         return { symbol: orderConfig.symbol, success: false };
       });
@@ -338,7 +369,11 @@ export class AlpacaService {
           this._logger.info(`GET ORDERS PLACED TODAY`, `Successfully retrieved ${orders.length} open orders.`);
       })
       .catch((err) => {
-        this._logger.error(`GET ORDERS PLACED TODAY`, `Problem retrieving orders placed today: `, err);
+        this._logger.error(
+          `GET ORDERS PLACED TODAY`, 
+          `Problem retrieving orders placed today: `, 
+          JSON.stringify(err)
+        );
         return err;
       });
   }
