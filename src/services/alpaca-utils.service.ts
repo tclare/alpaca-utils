@@ -5,6 +5,7 @@ import { AlpacaCredentialsConfig, WhichQuotes } from '../interfaces';
 import { ORDER_LIMIT_MAX } from '../constants/';
 import { getMOCDatetimeToday, getMOODatetimeToday, getStartOfToday } from './date-service';
 import Logger from '../logger';
+import { TradeUpdate } from '@master-chief/alpaca/@types/entities';
 
 export class AlpacaService {
   private _verbose: boolean;
@@ -378,13 +379,46 @@ export class AlpacaService {
       });
   }
 
-  listenForAuthentication(cb: () => void): void {
-    this._alpacaStream.once('authenticated', async () => {
-      this._logger.info(
-        'LISTEN (AUTHENTICATION)',
-        'Successfully authenticated to Alpaca stream :)'
-      );
-      await cb();
+  listenForAuthentication(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this._alpacaStream) {
+        this._logger.error(
+          'LISTEN (AUTHENTICATION)',
+          'Problem listening for trade updates: AlpacaService needs to be configured with type \'stream\''
+        );
+        return reject('wrong type of alpaca service');
+      };
+      this._alpacaStream.once('authenticated', () => {
+        this._logger.info(
+          'LISTEN (AUTHENTICATION)',
+          'Successfully authenticated to Alpaca stream :)'
+        );
+        return resolve();
+      })
     })
+  }
+
+  listenForTradeUpdates(cb: (tu: TradeUpdate) => void): void {
+    if (!this._alpacaStream) {
+      this._logger.error(
+        'LISTEN (TRADE UPDATES)',
+        'Problem listening for trade updates: AlpacaService needs to be configured with type \'stream\''
+      );
+      return;
+    };
+    this._alpacaStream.subscribe('trade_updates');
+    this._alpacaStream.on('trade_updates', cb);
+  }
+
+  stopListeningForTradeUpdates(): void {
+    if (!this._alpacaStream) {
+      this._logger.error(
+        'LISTEN (TRADE UPDATES)',
+        'Problem attempting to stop listening to trade updates: AlpacaService needs to be configured with type \'stream\''
+      );
+      return;
+    };
+    this._alpacaStream.unsubscribe('trade_updates');
+    this._alpacaStream.off('trade_updates');
   }
 }
