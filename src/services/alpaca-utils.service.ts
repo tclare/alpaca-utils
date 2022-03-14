@@ -227,9 +227,9 @@ export class AlpacaService {
       });
   }
 
-  closeAllPositions(): Promise<{ success: boolean }> {
+  closeAllPositions(config: { cancelOrders: boolean }): Promise<{ success: boolean }> {
     return this._alpacaClient
-      .closePositions()
+      .closePositions({ cancel_orders: config.cancelOrders || false })
       .then((orders) => {
         if (this._verbose)
           this._logger.info(`CLOSE ALL POSITIONS`, `${orders.length} previously open positions now closed.`);
