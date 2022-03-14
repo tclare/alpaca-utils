@@ -30,6 +30,10 @@ export function getMOODatetimeNDaysAgo(n: number) {
   return subDays(getMOODatetimeToday(), n);
 }
 
+export function getNoonESTToday() {
+  return parseTimeFromEst('12:00pm');
+}
+
 export function getMOCOrCurrentTime() {
   return isPast(getMOCDatetimeToday()) ? getMOCDatetimeToday() : getCurrentDate();
 }
