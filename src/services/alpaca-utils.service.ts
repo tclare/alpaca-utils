@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import Bluebird, { Promise as P } from 'bluebird';
-import { Account, AlpacaClient, AlpacaStream, Asset, Order, PlaceOrder, Position, Quote, ReplaceOrder, Snapshot } from '@master-chief/alpaca';
+import { Account, AlpacaClient, AlpacaStream, Asset, CancelOrder, Order, PlaceOrder, Position, Quote, ReplaceOrder, Snapshot } from '@master-chief/alpaca';
 import { AlpacaCredentialsConfig, WhichQuotes } from '../interfaces';
 import { ORDER_LIMIT_MAX } from '../constants/';
 import { getMOCDatetimeToday, getMOODatetimeToday, getStartOfToday } from './date-service';
@@ -277,6 +277,32 @@ export class AlpacaService {
       });
   }
 
+  cancelMultipleOrders(config: CancelOrder[]): Promise<void[]> {
+    return P.map(
+      config,
+      c => this.cancelOrder(c)
+    )
+  }
+
+  cancelOrder(config: CancelOrder): Promise<void> {
+    return this._alpacaClient
+      .cancelOrder(config)
+      .then(() => {
+        if (this._verbose) this._logger.info(
+          `CANCEL ORDER`,
+          `Successfully cancelled order with config ${JSON.stringify(config)}`
+        );
+      })
+      .catch(err => {
+        this._logger.warn(
+          `CANCEL ORDER`,
+          `Problem cancelling order with config ${JSON.stringify(config)}: `,
+          config
+        )
+        return err;
+      })
+  }
+
   cancelAllOrders(): Promise<{ success: boolean }> {
     return this._alpacaClient
       .cancelOrders()
@@ -293,13 +319,6 @@ export class AlpacaService {
         );
         return { success: false };
       });
-  }
-
-  getOrdersTodayOfType(orderType: OrderType): Promise<Order[]> {
-    return this._alpacaClient
-      .getOrders()
-      .then()
-      
   }
 
   /**
