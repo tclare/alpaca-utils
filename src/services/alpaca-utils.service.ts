@@ -1,11 +1,11 @@
 import _ from 'lodash';
 import Bluebird, { Promise as P } from 'bluebird';
-import { Account, AlpacaClient, AlpacaStream, Asset, Order, PlaceOrder, Position, Quote, Snapshot } from '@master-chief/alpaca';
+import { Account, AlpacaClient, AlpacaStream, Asset, Order, PlaceOrder, Position, Quote, ReplaceOrder, Snapshot } from '@master-chief/alpaca';
 import { AlpacaCredentialsConfig, WhichQuotes } from '../interfaces';
 import { ORDER_LIMIT_MAX } from '../constants/';
 import { getMOCDatetimeToday, getMOODatetimeToday, getStartOfToday } from './date-service';
 import Logger from '../logger';
-import { TradeUpdate } from '@master-chief/alpaca/@types/entities';
+import { OrderType, TradeUpdate } from '@master-chief/alpaca/@types/entities';
 
 export class AlpacaService {
   private _verbose: boolean;
@@ -295,6 +295,13 @@ export class AlpacaService {
       });
   }
 
+  getOrdersTodayOfType(orderType: OrderType): Promise<Order[]> {
+    return this._alpacaClient
+      .getOrders()
+      .then()
+      
+  }
+
   /**
    *
    * @param orderConfigs - an array of order config
@@ -352,13 +359,79 @@ export class AlpacaService {
   }
 
   /**
+   * This function replaces a single Alpaca order already placed.
+   * @param config: the configuration for the replacement 
+   * of a single symbol order.
+   * Returns the new order after replacement.
+   */
+  replaceOrder(
+    config: ReplaceOrder
+  ): Promise<Order> {
+    return this._alpacaClient
+      .replaceOrder(config)
+      .then((order) => {
+        if (this._verbose) this._logger.info(
+          `REPLACE ORDER`, 
+          `Successfully replaced order from symbol ${order.symbol} with config: `, 
+          `${JSON.stringify(config)}`
+        );
+        return order;
+      })
+      .catch((err) => {
+        this._logger.warn(
+          `PLACE ORDER`,
+          `Problem replacing order with config: `,
+          `${JSON.stringify(config)}: `,
+          `${JSON.stringify(err)}`
+        );
+        return err;
+      });
+  }
+
+  /**
+   * This function replaces many orders that already exist given some new order
+   * configurations.
+   * @param config: an array of order configs to replace the current ones with
+   * @returns a Promise that will resolve to the results of the overall batch 
+   * order placement.
+   */
+  replaceMultipleOrders(config: ReplaceOrder[]) {
+    return P.map(
+      config,
+      (ro) => this.replaceOrder(ro)
+    );
+  }
+
+  /**
+   * 
+   * @param includeAllOrders 
+   * @returns 
+   */
+
+  getOrdersPlacedTodayOfType(
+    orderType: OrderType,
+    includeAllOrders: boolean = true
+  ): Promise<Order[]> {
+    return this.getOrdersPlacedToday(includeAllOrders)
+      .then(orders => {
+        const returnedOrders = orders.filter(o => o.type === orderType);
+        if (this._verbose) this._logger.info(
+          `GET ORDERS TODAY OF TYPE`, 
+          `Further filtering orders down to ${returnedOrders.length}`);
+        return returnedOrders;
+      });
+  }
+
+  /**
    * This method returns a list of orders placed since market
    * open on the most recent day.
    * @param includeAllOrders: true if the returned orders should
    * include both orders that are still open and those that are closed.
    * @return: a promise of the orders, filtered as specified.
    */
-  getOrdersPlacedToday(includeAllOrders: boolean = false) {
+  getOrdersPlacedToday(
+    includeAllOrders: boolean = false
+  ): Promise<Order[]> {
     return this._alpacaClient
       .getOrders({
         status: includeAllOrders ? 'all' : 'open',
@@ -366,8 +439,11 @@ export class AlpacaService {
         after: getStartOfToday(),
       })
       .then((orders) => {
-        if (this._verbose)
-          this._logger.info(`GET ORDERS PLACED TODAY`, `Successfully retrieved ${orders.length} open orders.`);
+        if (this._verbose) this._logger.info(
+          `GET ORDERS PLACED TODAY`, 
+          `Successfully retrieved ${orders.length} orders.`
+        );
+        return orders;
       })
       .catch((err) => {
         this._logger.error(
