@@ -1,6 +1,6 @@
 import { isFuture, isPast, isSameMinute } from 'date-fns';
 import { ScheduledMarketFunction } from '../interfaces/scheduled-market-function';
-import Logger from '../logger';
+import { Logger } from '../logger';
 import { AlpacaService } from '../services/alpaca-utils.service';
 import { formatCurrentDateInEst, getCurrentDate, getCurrentZonedDate, parseTimeFromEst } from '../services';
 import { AlpacaCredentialsConfig } from '..';

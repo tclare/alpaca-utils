@@ -1,7 +1,7 @@
 import { formatInTimeZone } from 'date-fns-tz';
 import { getCurrentDate } from '../services/date-service';
 
-export default class Logger {
+export class Logger {
   getCurrentTimeFormatted(): string {
     return formatInTimeZone(getCurrentDate(), 'America/New_York', 'hh:mm:ss zz');
   }

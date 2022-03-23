@@ -4,7 +4,7 @@ import { Account, AlpacaClient, AlpacaStream, Asset, CancelOrder, Order, PlaceOr
 import { AlpacaCredentialsConfig, WhichQuotes } from '../interfaces';
 import { ORDER_LIMIT_MAX } from '../constants/';
 import { getMOCDatetimeToday, getMOODatetimeToday, getStartOfToday } from './date-service';
-import Logger from '../logger';
+import { Logger } from '../logger';
 import { OrderType, TradeUpdate } from '@master-chief/alpaca/@types/entities';
 
 export class AlpacaService {
